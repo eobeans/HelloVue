@@ -96,6 +96,7 @@ export default {
             this.$http.post('http://localhost:3000/postUser',{loginForm:_this.loginForm}).then((res)=>{
                 if(res.body.code == 0){
                     _this.$store.commit('setUser',res.body.userId)
+                    _this.$store.commit('setUserName',res.body.username)
                     this.$router.push('/doctor')
                 }else{
                     alert('账号密码错误！')

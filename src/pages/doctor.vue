@@ -35,7 +35,7 @@
     font-weight: bold;
 }
 .content{
-    padding-left: 5px;
+    
 }
 .contentMargin{
     margin-right:12px;
@@ -103,6 +103,7 @@
                             <Col span="6">职位：{{position}}</Col>
                             <Col span="6">今日号数：{{remain}}</Col>
                         </row>
+                        
                         <Divider />
                         <row justify="start">
                             <Col span="3">请选择预约日期：</Col>
@@ -124,19 +125,19 @@
                                         </TimelineItem>
                                         <TimelineItem>
                                             <p class="time">8:00--9:00</p>
-                                            <Button class="content contentMargin" v-for="(x,index) in List.l01" :key="index" @click.native="postAppointment(x,0)" v-if="x">第{{List.l01[index]}}号</Button>                                            
+                                            <Button class="content contentMargin" v-for="(x,index) in List.l01" :key="index" @click.native="postAppointment(x,0,'8:00--9:00')" v-show="x">第{{x}}号</Button>                                            
                                         </TimelineItem>
                                         <TimelineItem>
                                             <p class="time">9:00--10:00</p>
-                                            <Button class="content contentMargin" v-for="(x,index) in List.l02" :key="index" @click.native="postAppointment(x,0)" v-if="x">第{{List.l02[index]}}号</Button>
+                                            <Button class="content contentMargin" v-for="(x,index) in List.l02" :key="index" @click.native="postAppointment(x,0,'9:00--10:00')" v-if="x">第{{List.l02[index]}}号</Button>
                                         </TimelineItem>
                                         <TimelineItem>
                                             <p class="time">10:00--11:00</p>
-                                            <Button class="content contentMargin" v-for="(x,index) in List.l03" :key="index" @click.native="postAppointment(x,0)" v-if="x">第{{List.l03[index]}}号</Button>                                            
+                                            <Button class="content contentMargin" v-for="(x,index) in List.l03" :key="index" @click.native="postAppointment(x,0,'10:00--11:00')" v-if="x">第{{List.l03[index]}}号</Button>                                            
                                         </TimelineItem>
                                         <TimelineItem>
                                             <p class="time">11:00-11:30</p>
-                                            <Button class="content contentMargin" v-for="(x,index) in List.l04" :key="index" @click.native="postAppointment(x,0)" v-if="x">第{{List.l04[index]}}号</Button>
+                                            <Button class="content contentMargin" v-for="(x,index) in List.l04" :key="index" @click.native="postAppointment(x,0,'11:00-11:30')" v-if="x">第{{List.l04[index]}}号</Button>
                                         </TimelineItem>
                                     </Timeline>
                                 </div>
@@ -146,20 +147,20 @@
                                             <p class="time">请选择上午预约号</p>
                                         </TimelineItem>
                                         <TimelineItem>
-                                            <p class="time">2:30--3:15</p>
-                                            <Button class="content contentMargin" v-for="(x,index) in List.l11" :key="index" @click.native="postAppointment(x,1)" v-if="x">第{{List.l11[index]}}号</Button>                                            
+                                            <p class="time">14:30--15:15</p>
+                                            <Button class="content contentMargin" v-for="(x,index) in List.l11" :key="index" @click.native="postAppointment(x,1,'14:30--15:15')" v-if="x">第{{List.l11[index]}}号</Button>                                            
                                         </TimelineItem>
                                         <TimelineItem>
-                                            <p class="time">3:15--4:00</p>
-                                            <Button class="content contentMargin" v-for="(x,index) in List.l12" :key="index" @click.native="postAppointment(x,1)" v-if="x">第{{List.l12[index]}}号</Button>
+                                            <p class="time">15:15--16:00</p>
+                                            <Button class="content contentMargin" v-for="(x,index) in List.l12" :key="index" @click.native="postAppointment(x,1,'15:15--16:00')" v-if="x">第{{List.l12[index]}}号</Button>
                                         </TimelineItem>
                                         <TimelineItem>
-                                            <p class="time">4:00--4:45</p>
-                                            <Button class="content contentMargin" v-for="(x,index) in List.l13" :key="index" @click.native="postAppointment(x,1)" v-if="x">第{{List.l13[index]}}号</Button>                                            
+                                            <p class="time">16:00--16:45</p>
+                                            <Button class="content contentMargin" v-for="(x,index) in List.l13" :key="index" @click.native="postAppointment(x,1,'16:00--16:45')" v-if="x">第{{List.l13[index]}}号</Button>                                            
                                         </TimelineItem>
                                         <TimelineItem>
-                                            <p class="time">4:45-5:30</p>
-                                            <Button class="content contentMargin" v-for="(x,index) in List.l14" :key="index" @click.native="postAppointment(x,1)" v-if="x">第{{List.l14[index]}}号</Button>
+                                            <p class="time">16:45-17:30</p>
+                                            <Button class="content contentMargin" v-for="(x,index) in List.l14" :key="index" @click.native="postAppointment(x,1,'16:45-17:30')" v-if="x">第{{List.l14[index]}}号</Button>
                                         </TimelineItem>
                                     </Timeline>
                                 </div>
@@ -200,7 +201,7 @@
                     l13:[],
                     l14:[],
                 },
-                number:[],
+                orderNumber:[],
                 isActive:{
                     t1:0,
                     t2:0,
@@ -213,6 +214,7 @@
                 time:[],
                 appointTime:'',
                 accessTime:'',
+                serial:'',
             }
         },
         mounted:
@@ -306,6 +308,7 @@
                     if(res.body.code == 0){
                         let doctor=res.body.doctor
                         _this.name=doctor.name
+                        _this.$store.commit('setDoctorName',doctor.name)
                         _this.position=doctor.position
                         _this.remain=doctor.remain
                     }
@@ -319,6 +322,15 @@
                 _this.isActive.t5=0
                 _this.isActive.t6=0
                 _this.isActive.t7=0
+            },
+            postAppointment(num,state,timeLine){
+                let myDate=new Date()
+                this.serial=this.$store.state.User.userId+myDate.getTime()
+                this.$store.commit('setAppointment',this.serial)
+                this.$store.commit('setNumber',num)
+                this.$store.commit('setAppointState',state)
+                this.$store.commit('setTimeLine',timeLine)
+                this.$router.push('/appointment')
             },
             selectTime(day,num){
                 let _this=this
@@ -380,29 +392,32 @@
                                     _this.List.l14.push(i+1)
                                 }
                             }
-                            if(res.body.number != null){
-                                _this.number=res.body.number
-                                let len = _this.number.length()
+                            _this.orderNumber=res.body.result
+                            // alert(_this.orderNumber.length)
+                            if(res.body.codeNum == 0){
+                                let len = _this.orderNumber.length
                                 for(let i=0;i<len;i++){
-                                    if(res.body.state[i] == 0){
-                                        if(res.body.number[i]<_this.remain/4){
-                                            _this.List.l01[res.body.number[i]-1]=0
-                                        }else if(res.body.number[i]<_this.remain/2){
-                                            _this.List.l02[res.body.number[i]-(_this.remain/4)-1]=0
-                                        }else if(res.body.number[i]<_this.remain*(3/4)){
-                                            _this.List.l03[res.body.number[i]-(_this.remain/2)-1]=0
+                                    if(res.body.result[i].state == 0){
+                                        // alert('上午')
+                                        if(res.body.result[i].number<_this.remain/4){
+                                            _this.List.l01[res.body.result[i].number-1]=0
+                                            // alert(_this.List.l01[res.body.result[i].number-1])
+                                        }else if(res.body.result[i].number<_this.remain/2){
+                                            _this.List.l02[res.body.result[i].number-(_this.remain/4)-1]=0
+                                        }else if(res.body.result[i].number<_this.remain*(3/4)){
+                                            _this.List.l03[res.body.result[i].number-(_this.remain/2)-1]=0
                                         }else{
-                                            _this.List.l04[res.body.number[i]-_this.remain*(3/4)-1]=0
+                                            _this.List.l04[res.body.result[i].number-_this.remain*(3/4)-1]=0
                                         }
                                     }else{
-                                        if(res.body.number[i]<_this.remain/4){
-                                            _this.List.l11[res.body.number[i]-1]=0
-                                        }else if(res.body.number[i]<_this.remain/2){
-                                            _this.List.l12[res.body.number[i]-(_this.remain/4)-1]=0
-                                        }else if(res.body.number[i]<_this.remain*(3/4)){
-                                            _this.List.l13[res.body.number[i]-(_this.remain/2)-1]=0
+                                        if(res.body.result[i].number<_this.remain/4){
+                                            _this.List.l11[res.body.result[i].number-1]=0
+                                        }else if(res.body.result[i].number<_this.remain/2){
+                                            _this.List.l12[res.body.result[i].number-(_this.remain/4)-1]=0
+                                        }else if(res.body.result[i].number<_this.remain*(3/4)){
+                                            _this.List.l13[res.body.result[i].number-(_this.remain/2)-1]=0
                                         }else{
-                                            _this.List.l14[res.body.number[i]-_this.remain*(3/4)-1]=0
+                                            _this.List.l14[res.body.result[i].number-_this.remain*(3/4)-1]=0
                                         }
                                     }
                                 }
@@ -413,15 +428,6 @@
                     })
                 }
             },
-            postAppointment(num,state){
-                _this=this
-                alert('come in!')
-                this.$http.post('http://localhost:3000/postAppointment.json',{number:num,state:state,doctorId:_this.doctorId}).then(res=>{
-                    if(res.body.code==0){
-                        alert(num)
-                    }
-                })
-            }
         }
     }
 </script>

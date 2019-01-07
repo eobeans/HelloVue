@@ -23,7 +23,7 @@ function dataJson(data){
 }
 
 function selectUserbyUser(userName,password,callback) {
-    sql="SELECT userName,password,userId FROM user WHERE userName='"+userName+"'and passWord='"+password+"'"   
+    sql="SELECT userName,password,userId,name FROM user WHERE userName='"+userName+"'and passWord='"+password+"'"   
     pool.getConnection(function(err,connection){
       if(err) throw err
 
@@ -67,8 +67,8 @@ function selectDoctorById(doctorId,callback){
   })
 }
 
-function selectOrderByIdTime(doctorId,time,callback){
-  sql="SELECT number,state FROM `order` where appointTime='"+time+"' AND doctorId='"+doctorId+"'"
+function selectOrderByIdTime(order,callback){
+  sql="SELECT number,state FROM `order` where cancel=0 AND accessTime='"+order.accessTime+"' AND doctorId='"+order.doctorId+"'"
   pool.getConnection((err,connection)=>{
     if(err) throw err
 
@@ -95,6 +95,49 @@ function insertUser(registerForm,callback){
     connection.release()
   })
 }
+
+function selectOrderByOrder(order,callback){
+  sql="SELECT number,state FROM `order` where appointTime='"+order.appointTime+"' AND doctorId='"+order.doctorId+"'"
+  pool.getConnection((err,connection)=>{
+    if(err) throw err
+
+    connection.query(sql,(err,result)=>{
+      if(err)  throw err
+
+      let a = dataJson(result)
+      callback(a)
+    })
+    connection.release()
+  })
+}
+
+function insertOrder(order,callback){
+  sql="INSERT INTO `order` (serial,number,userId,doctorId,state,appointTime,accessTime,timeLine) VALUES ('"+order.serial+"',"+order.number+",'"+order.userId+"','"+order.doctorId+"',"+order.appointState+",'"+order.appointTime+"','"+order.accessTime+"','"+order.timeLine+"')"
+  pool.getConnection((err,connection)=>{
+    if(err) throw err
+
+    connection.query(sql,(err,result)=>{
+      if(err)  throw err
+
+      callback()
+    })
+    connection.release()
+  })
+}
+
+function updatetOrder(cancleOrder,callback){
+  sql="UPDATE `order` SET cancel = 1 WHERE serial = '"+cancleOrder.serial+"'"
+  pool.getConnection((err,connection)=>{
+    if(err) throw err
+
+    connection.query(sql,(err,result)=>{
+      if(err)  throw err
+
+      callback()
+    })
+    connection.release()
+  })
+}
 // getDoctorInfo((result)=>{
 //   console.log(result[1].name)
 //   console.log(result)
@@ -106,4 +149,7 @@ module.exports={
   selectDoctorById:selectDoctorById,
   selectOrderByIdTime:selectOrderByIdTime,
   insertUser:insertUser,
+  selectOrderByOrder:selectOrderByOrder,
+  insertOrder:insertOrder,
+  updatetOrder:updatetOrder,
 }

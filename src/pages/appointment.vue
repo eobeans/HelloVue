@@ -54,23 +54,30 @@
                                         <p slot="title">预约订单</p>
                                         <Row style="margin-bottom:18px;">
                                             <Col span="6">流水号：</Col>
-                                            <Col span="12">123213213213</Col>
+                                            <Col span="12">{{$store.state.User.serial}}</Col>
                                         </Row>
                                         <Row style="margin-bottom:18px;">
                                             <Col span="6">患者姓名：</Col>
-                                            <Col span="12">Mr.Li</Col>
+                                            <Col span="12">{{$store.state.User.userName}}</Col>
                                         </Row>
                                         <Row style="margin-bottom:18px;">
                                             <Col span="6">接诊医生：</Col>
-                                            <Col span="12">礼泽琛</Col>
+                                            <Col span="12">{{$store.state.User.doctorName}}</Col>
+                                        </Row>
+                                        <Row style="margin-bottom:18px;">
+                                            <Col span="6">排队号：</Col>
+                                            <Col span="12">{{$store.state.User.number}}</Col>
                                         </Row>
                                         <Row style="margin-bottom:24px;">
                                             <Col span="6">接诊时间：</Col>
-                                            <Col span="12">2019-01-19&nbsp;&nbsp;&nbsp;&nbsp;9:00-10:00</Col>
+                                            <Col span="12">{{$store.state.User.accessTime}}&nbsp;&nbsp;&nbsp;&nbsp;{{$store.state.User.timeLine}}</Col>
                                         </Row>
                                         <Row style="margin-bottom:18px;">
-                                            <Col span="8" offset="8" style="text-align:center">
-                                            <span style="border: 1px solid #d7dde4;padding:6px;">取消订单</span>
+                                            <Col span="8" offset="4" style="text-align:center">
+                                                <Button  @click.native="comfireAppointment()">确认订单</Button>
+                                            </Col>
+                                            <Col span="8"  style="text-align:center">
+                                                <Button  @click.native="cancelAppointment()">取消订单</Button>
                                             </Col>
                                         </Row>
                                     </Card>
@@ -88,16 +95,78 @@
     export default {
         data(){
             return{
-                goValue:''
+                order:{
+                    userId:'',
+                    userName:'',
+                    doctorId:'',
+                    doctorName:'',
+                    serial:'',
+                    number:'',
+                    appointState:'',
+                    appointTime:'',
+                    accessTime:'',
+                    timeLine:'',
+                },
+                cancleOrder:{
+                    userId:'',
+                    doctorId:'',
+                    serial:'',
+                },
+                count:0,
             }
         },
+        // mounted:
+        //     function(){
+        //         let _this = this
+
+        //     },
         methods:{
             goBackDoctor:function(){
                 this.$router.push('/doctor')
             },
             goBackHome:function(){
                 this.$router.push('/home')
-            }
+            },
+            cancelAppointment(){
+                let _this = this
+                this.cancleOrder.userId=this.$store.state.User.userId
+                this.cancleOrder.doctorId=this.$store.state.User.doctorId
+                this.cancleOrder.serial=this.$store.state.User.serial
+                this.$http.post('http://localhost:3000/cancelAppointment.json',{cancleOrder:_this.cancleOrder}).then(res=>{
+                    if(res.body.code == 0){
+                        alert('订单取消成功，确定后将返回上一页')
+                        _this.$router.push('/doctor')
+                    }
+                })
+            },
+            comfireAppointment(){
+                let _this = this
+                this.order.userId=this.$store.state.User.userId
+                this.order.doctorId=this.$store.state.User.doctorId
+                this.order.serial=this.$store.state.User.serial
+                this.order.number=this.$store.state.User.number
+                this.order.appointState=this.$store.state.User.appointState
+                this.order.appointTime='2019-'+this.$store.state.User.appointTime
+                this.order.accessTime='2019-'+this.$store.state.User.accessTime
+                this.order.timeLine=this.$store.state.User.timeLine
+                if(this.count == 0){
+                    this.$http.post('http://localhost:3000/postAppointment.json',{order:_this.order}).then((res)=>{
+                        if(res.body.code == 0){
+                            _this.count = res.body.count
+                            alert('订单确认成功')
+                        }else{
+                            _this.count = 0
+                            alert('系统出问题了')
+                        }
+                    },(res)=>{
+                        _this.count = 0
+                        alert('出错误了！')
+                    })
+                }else{
+                    alert('该订单已经提交！')
+                }
+                
+            },
         }
     }
 </script>

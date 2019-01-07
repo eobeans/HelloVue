@@ -32,11 +32,6 @@ app.get('/getDoctor.json',(req,res)=>{
     })
 })
 
-app.get('/keepUser.json',(req,res)=>{
-    res.cookie('username','233')
-    console.log(req.cookies)
-})
-
 app.post('/postUser',(req,res)=>{
     Username=req.body.loginForm.username
     Password=req.body.loginForm.password
@@ -44,7 +39,7 @@ app.post('/postUser',(req,res)=>{
         if(result!=null){
             let obj={
                 code:0,
-                username:result.userName,
+                username:result.name,
                 userId:result.userId,
                 //password:result.password,
             }
@@ -78,30 +73,55 @@ app.post('/selectDoctorById.json',(req,res)=>{
 })
 
 app.post('/selectTime.json',(req,res)=>{
-    let doctorId=req.body.doctorId
     let time='2019-'+req.body.accessTime
-    patient.selectOrderByIdTime(doctorId,time,(result)=>{
+    let order={
+        doctorId:req.body.doctorId,
+        accessTime:time
+    }
+    patient.selectOrderByIdTime(order,(result)=>{
+        if(result[0] != null){
+            let obj={
+                code:0,
+                codeNum:0,
+                result:result,
+            }
+            res.json(obj)
+        }else{
+            let obj={
+                code:0,
+                codeNum:1,
+            }
+            res.json(obj)
+        }
+        
+    })
+})
+
+app.post('/postRegisterForm.json',(req,res)=>{
+    patient.insertUser(req.body.registerForm,result=>{
         let obj={
             code:0,
-            number:result.number,
-            state:result.state,
         }
         res.json(obj)
     })
 })
 
 app.post('/postAppointment.json',(req,res)=>{
-    console.log(req.body.state)
-    console.log(req.body.number)
-    let obj={
-        code:0,
-    }
-    res.json(obj)
+    let order = req.body.order
+    patient.insertOrder(order,result=>{
+        let obj = {
+            code:0,
+            count:1,
+        }
+        res.json(obj)
+    })
 })
 
-app.post('/postRegisterForm.json',(req,res)=>{
-    patient.insertUser(req.body.registerForm,result=>{
-        let obj={
+app.post('/cancelAppointment.json',(req,res)=>{
+    let cancleOrder = req.body.cancleOrder
+    //console.log(cancleOrder.serial)
+    patient.updatetOrder(cancleOrder,result=>{
+        let obj = {
             code:0,
         }
         res.json(obj)
