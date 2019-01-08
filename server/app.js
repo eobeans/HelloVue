@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 let Promise = require('promise')
 let patient = require('./utiles/patient')
-
+let asset = require('./utiles/asset')
 const app = express()
 
 let allowCrossDomain = function(req, res, next) {
@@ -29,6 +29,28 @@ app.get('/getDoctor.json',(req,res)=>{
         }
         res.json(obj)
         
+    })
+})
+
+app.get('/getDoctorIdList.json',(req,res)=>{
+    asset.getDoctorIdList((result)=>{
+        let obj={
+            code:0,
+            doctorIdList:result,
+        }
+        res.json(obj)
+    })
+})
+
+app.post('/getDoctorById.json',(req,res)=>{
+    asset.getDoctorById(req.body.doctorId,(result)=>{
+        let obj={
+            code:0,
+            name:result.name,
+            department:result.department,
+            remain:result.remain,
+        }
+        res.json(obj)
     })
 })
 
@@ -121,6 +143,15 @@ app.post('/cancelAppointment.json',(req,res)=>{
     let cancleOrder = req.body.cancleOrder
     //console.log(cancleOrder.serial)
     patient.updatetOrder(cancleOrder,result=>{
+        let obj = {
+            code:0,
+        }
+        res.json(obj)
+    })
+})
+
+app.post('/newAsset.json',(req,res)=>{
+    asset.addAsset(req.body.doctorId,req.body.addAsset,(result)=>{
         let obj = {
             code:0,
         }

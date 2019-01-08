@@ -138,10 +138,6 @@ function updatetOrder(cancleOrder,callback){
     connection.release()
   })
 }
-// getDoctorInfo((result)=>{
-//   console.log(result[1].name)
-//   console.log(result)
-// })
 
 module.exports={
   selectUserbyUser:selectUserbyUser,

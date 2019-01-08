@@ -16,17 +16,21 @@ import Home from './pages/home.vue'
 import Appointment from './pages/appointment.vue'
 import Doctor from './pages/doctor.vue'
 import Register from './pages/register.vue'
+import Asset from './pages/asset.vue'
+import NewAsset from './pages/newAsset.vue'
 import store from '../store/index'
 
 
 const router = new VueRouter({
   routes:[
-    {path:'/',component:Home},
+    {path:'/',component:Asset},
     {path:'/home',component:Home},
     {path:'/appointment',component:Appointment},
     {path:'/doctor',component:Doctor},
     {path:'/welcoome',component:Welcome},
-    {path:'/Register',component:Register}
+    {path:'/register',component:Register},
+    {path:'/asset',component:Asset},
+    {path:'/newAsset',component:NewAsset},
   ]
 })
 
