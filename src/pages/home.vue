@@ -16,7 +16,7 @@
                 <Content :style="{padding: '0 50px'}">
                     <Card>
                         <div style="min-height: 390px;">
-                            <form :model="loginForm" style="margin-top:160px;margin-left:410px;">
+                            <form :model="loginForm" style="margin-top:160px;margin-left:540px;">
                                 <input type="text" name="username" class="inputText" v-model="loginForm.username" placeholder="用户" autocomplete="on">
                                 <input type="password" name="password" class="inputText" v-model="loginForm.password" placeholder="密码" autocomplete="on">
                                 <span @click.stop.prevent.self="handleLogin" style="margin-left:12px;">Login</span>
@@ -95,9 +95,13 @@ export default {
             let _this = this
             this.$http.post('http://localhost:3000/postUser',{loginForm:_this.loginForm}).then((res)=>{
                 if(res.body.code == 0){
-                    _this.$store.commit('setUser',res.body.userId)
-                    _this.$store.commit('setUserName',res.body.username)
-                    this.$router.push('/doctor')
+                    if(res.body.username == 'admin'){
+                        this.$router.push('/asset')
+                    }else{
+                        _this.$store.commit('setUser',res.body.userId)
+                        _this.$store.commit('setUserName',res.body.username)
+                        this.$router.push('/doctor')
+                    }
                 }else{
                     alert('账号密码错误！')
                 }

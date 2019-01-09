@@ -111,6 +111,21 @@ function selectOrderByOrder(order,callback){
   })
 }
 
+function selectAssetByWorkTime(doctorId,workTime,callback){
+  sql="SELECT * FROM `asset` where workTime='"+workTime+"' and doctorId='"+doctorId+"'"
+  pool.getConnection((err,connection)=>{
+    if(err) throw err
+
+    connection.query(sql,(err,result)=>{
+      if(err)  throw err
+      
+      let a = dataJson(result)
+      callback(a)
+    })
+    connection.release()
+  })
+}
+
 function insertOrder(order,callback){
   sql="INSERT INTO `order` (serial,number,userId,doctorId,state,appointTime,accessTime,timeLine) VALUES ('"+order.serial+"',"+order.number+",'"+order.userId+"','"+order.doctorId+"',"+order.appointState+",'"+order.appointTime+"','"+order.accessTime+"','"+order.timeLine+"')"
   pool.getConnection((err,connection)=>{
@@ -148,4 +163,5 @@ module.exports={
   selectOrderByOrder:selectOrderByOrder,
   insertOrder:insertOrder,
   updatetOrder:updatetOrder,
+  selectAssetByWorkTime:selectAssetByWorkTime,
 }

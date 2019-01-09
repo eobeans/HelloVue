@@ -215,6 +215,7 @@
                 appointTime:'',
                 accessTime:'',
                 serial:'',
+                asset:1,
             }
         },
         mounted:
@@ -363,69 +364,78 @@
                     }else if(num == 7){
                         _this.isActive.t7=1
                     }
+                    _this.List.l0=[]
+                    _this.List.l1=[]
+                    _this.List.l01=[]
+                    _this.List.l02=[]
+                    _this.List.l03=[]
+                    _this.List.l04=[]
+                    _this.List.l11=[]
+                    _this.List.l12=[]
+                    _this.List.l13=[]
+                    _this.List.l14=[]
                     this.$http.post('http://localhost:3000/selectTime.json',{accessTime:_this.accessTime,doctorId:_this.doctorId}).then(res=>{
                         if(res.body.code == 0){
-                            _this.List.l0=[]
-                            _this.List.l1=[]
-                            _this.List.l01=[]
-                            _this.List.l02=[]
-                            _this.List.l03=[]
-                            _this.List.l04=[]
-                            _this.List.l11=[]
-                            _this.List.l12=[]
-                            _this.List.l13=[]
-                            _this.List.l14=[]
-                            for (let i=0;i< _this.remain;i++){
-                                _this.List.l0.push(i+1)
-                                _this.List.l1.push(i+1)
-                                if (i<_this.remain/4){
-                                    _this.List.l01.push(i+1)
-                                    _this.List.l11.push(i+1)
-                                }else if(i<_this.remain/2){
-                                    _this.List.l02.push(i+1)
-                                    _this.List.l12.push(i+1)
-                                }else if(i<_this.remain*(3/4)){
-                                    _this.List.l03.push(i+1)
-                                    _this.List.l13.push(i+1)
-                                }else{
-                                    _this.List.l04.push(i+1)
-                                    _this.List.l14.push(i+1)
-                                }
-                            }
-                            _this.orderNumber=res.body.result
-                            // alert(_this.orderNumber.length)
-                            if(res.body.codeNum == 0){
-                                let len = _this.orderNumber.length
-                                for(let i=0;i<len;i++){
-                                    if(res.body.result[i].state == 0){
-                                        // alert('上午')
-                                        if(res.body.result[i].number<_this.remain/4){
-                                            _this.List.l01[res.body.result[i].number-1]=0
-                                            // alert(_this.List.l01[res.body.result[i].number-1])
-                                        }else if(res.body.result[i].number<_this.remain/2){
-                                            _this.List.l02[res.body.result[i].number-(_this.remain/4)-1]=0
-                                        }else if(res.body.result[i].number<_this.remain*(3/4)){
-                                            _this.List.l03[res.body.result[i].number-(_this.remain/2)-1]=0
-                                        }else{
-                                            _this.List.l04[res.body.result[i].number-_this.remain*(3/4)-1]=0
-                                        }
+                            //该医生今日有排班
+                            
+                            if(res.body.orderObj.code == 0){
+                                for (let i=0;i< _this.remain;i++){
+                                    _this.List.l0.push(i+1)
+                                    _this.List.l1.push(i+1)
+                                    if (i<_this.remain/4){
+                                        _this.List.l01.push(i+1)
+                                        _this.List.l11.push(i+1)
+                                    }else if(i<_this.remain/2){
+                                        _this.List.l02.push(i+1)
+                                        _this.List.l12.push(i+1)
+                                    }else if(i<_this.remain*(3/4)){
+                                        _this.List.l03.push(i+1)
+                                        _this.List.l13.push(i+1)
                                     }else{
-                                        if(res.body.result[i].number<_this.remain/4){
-                                            _this.List.l11[res.body.result[i].number-1]=0
-                                        }else if(res.body.result[i].number<_this.remain/2){
-                                            _this.List.l12[res.body.result[i].number-(_this.remain/4)-1]=0
-                                        }else if(res.body.result[i].number<_this.remain*(3/4)){
-                                            _this.List.l13[res.body.result[i].number-(_this.remain/2)-1]=0
+                                        _this.List.l04.push(i+1)
+                                        _this.List.l14.push(i+1)
+                                    }
+                                }
+                                // alert('come in select time')
+                                _this.orderNumber=res.body.orderObj.result
+                                // alert(_this.orderNumber.length)
+                                if(res.body.orderObj.codeNum == 0){
+                                    let len = _this.orderNumber.length
+                                    for(let i=0;i<len;i++){
+                                        if(res.body.orderObj.result[i].state == 0){
+                                            // alert('上午')
+                                            if(res.body.orderObj.result[i].number<_this.remain/4){
+                                                _this.List.l01[res.body.orderObj.result[i].number-1]=0
+                                                // alert(_this.List.l01[res.body.orderObj.result[i].number-1])
+                                            }else if(res.body.orderObj.result[i].number<_this.remain/2){
+                                                _this.List.l02[res.body.orderObj.result[i].number-(_this.remain/4)-1]=0
+                                            }else if(res.body.orderObj.result[i].number<_this.remain*(3/4)){
+                                                _this.List.l03[res.body.orderObj.result[i].number-(_this.remain/2)-1]=0
+                                            }else{
+                                                _this.List.l04[res.body.orderObj.result[i].number-_this.remain*(3/4)-1]=0
+                                            }
                                         }else{
-                                            _this.List.l14[res.body.result[i].number-_this.remain*(3/4)-1]=0
+                                            if(res.body.orderObj.result[i].number<_this.remain/4){
+                                                _this.List.l11[res.body.orderObj.result[i].number-1]=0
+                                            }else if(res.body.orderObj.result[i].number<_this.remain/2){
+                                                _this.List.l12[res.body.orderObj.result[i].number-(_this.remain/4)-1]=0
+                                            }else if(res.body.orderObj.result[i].number<_this.remain*(3/4)){
+                                                _this.List.l13[res.body.orderObj.result[i].number-(_this.remain/2)-1]=0
+                                            }else{
+                                                _this.List.l14[res.body.orderObj.result[i].number-_this.remain*(3/4)-1]=0
+                                            }
                                         }
                                     }
                                 }
                             }
+                        }else{
+                            _this.$Message.info('该医生今日休息')
                         }
+                        
                     },res=>{
                         console.log('fail to get asset!')
                     })
+                    
                 }
             },
         }

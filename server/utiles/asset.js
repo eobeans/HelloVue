@@ -2,6 +2,8 @@ let mysql = require('mysql')
 let moment = require('moment')
 let Promise = require('promise')
 
+
+
 let pool = mysql.createPool({
     host     : 'localhost',
     user     : 'root',
@@ -18,28 +20,56 @@ function dataJson(data){
 
 function assetWork(){
     new Promise((resolve,reject)=>{
-        sql="SELECT doctorId,department,remain,lastWorkTime FROM doctor"
+        sql="SELECT * FROM doctor"
         pool.getConnection(function(err,connection){
             if(err) throw err
-
+        
             connection.query(sql,(err,result)=>{
                 if(err) throw err
-
-                let a=dataJson(result)
+        
+                let a = dataJson(result)
                 resolve(a)
             })
-            connection.release()
+        connection.release()
         })
     }).then((result)=>{
         let date = result
         let len = date.length
-        for(let i = 0;i<len;i++){
-            if(momoment(date[i].lastWorkTime).isAfter('2019-1-7')){
-                console.log('no')
+        pool.getConnection(function(err,connection){
+            for(let i = 0;i<len;i++){
+                for(let j = 0;j<21;j++){
+                    let workTime=moment().add(j, 'd').format('YYYY-MM-DD')
+                    sql="INSERT INTO `asset` (doctorId,name,department,workState,workTime,remain) VALUES ('"+date[i].doctorId+"','"+date[i].name+"','"+date[i].department+"','"+1+"','"+workTime+"','"+date[i].remain+"')"
+                    connection.query(sql,(err,result)=>{
+                        if(err) throw err
+                        
+                        console.log('success add:'+date[i].doctorId)
+                    })
+                }
+
             }
-        }
+            connection.release()
+        })
     }).catch(err=>{
         console.log(err)
+    })
+}
+
+function deleteAsset(){
+    pool.getConnection(function(err,connection){
+        if(err) throw err
+        
+        let j = 0
+        for(let i = 0;i<60;i++){
+            j =   j + 5
+            sql="DELETE FROM `asset` WHERE ID = ' "+j+"'"
+            connection.query(sql,(err,result)=>{
+                if(err) throw err
+          
+                console.log('delete where ID ='+j)
+            })
+        }
+        connection.release()
     })
 }
 
@@ -87,10 +117,73 @@ function addAsset(doctorId,addAsset,callback){
     })
 }
 
+function getAsset(callback){
+    sql="SELECT * FROM asset"
+    pool.getConnection(function(err,connection){
+        if(err) throw err
+    
+        connection.query(sql,(err,result)=>{
+          if(err) throw err
+            
+          let a = dataJson(result)
+          callback(a)
+        })
+        connection.release()
+    })
+}
+
+function getAssetBySearch(strValue,callback){
+    sql="SELECT * FROM asset where department='"+strValue+"'"
+    pool.getConnection(function(err,connection){
+        if(err) throw err
+    
+        connection.query(sql,(err,result)=>{
+          if(err) throw err
+            
+          let a = dataJson(result)
+          callback(a)
+        })
+        connection.release()
+    })
+}
+
+function selectAssetById(strValue,callback){
+    sql="SELECT * FROM asset where doctorId='"+strValue+"'"
+    pool.getConnection(function(err,connection){
+        if(err) throw err
+    
+        connection.query(sql,(err,result)=>{
+          if(err) throw err
+            
+          let a = dataJson(result)
+          callback(a)
+        })
+        connection.release()
+    })
+}
+
+function selectAssetByName(strValue,callback){
+    sql="SELECT * FROM asset where `name`='"+strValue+"'"
+    pool.getConnection(function(err,connection){
+        if(err) throw err
+    
+        connection.query(sql,(err,result)=>{
+          if(err) throw err
+            
+          let a = dataJson(result)
+          callback(a)
+        })
+        connection.release()
+    })
+}
 module.exports={
     // selectUserbyUser:selectUserbyUser,
     getDoctorIdList:getDoctorIdList,
     getDoctorById:getDoctorById,
     addAsset:addAsset,
+    getAsset:getAsset,
+    getAssetBySearch:getAssetBySearch,
+    selectAssetById:selectAssetById,
+    selectAssetByName:selectAssetByName,
   }
   

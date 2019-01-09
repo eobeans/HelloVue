@@ -49,7 +49,8 @@
                         <Button type="primary" @click.native.prevent="goToNewAsset">增加新排班</Button>
                     </Col>
                     <Col span="3">
-                        <Input suffix="ios-search" placeholder="请输入工号/姓名/科室" style="width: auto" />
+                        <Input suffix="ios-search" placeholder="请输入工号/姓名/科室" style="width: auto" @click.native="search"  @keyup.enter.native="search" v-model="searchValue"/>
+                        <!-- <Input search enter-button="search" style="width: auto" placeholder="请输入工号/姓名/科室" v-model="searchValue" /> -->
                     </Col>
                 </row>
                 <Divider />
@@ -122,7 +123,7 @@
                     },
                     {
                         title: '工作日期',
-                        slot: 'workTime'
+                        slot: 'workTime',
                     },
                     {
                         title: '应接诊数',
@@ -133,45 +134,11 @@
                         slot: 'action'
                     }
                 ],
-                data: [
-                    {
-                        doctorId:'00010001',
-                        name: '王小明',
-                        department:'内科',
-                        workState:'全天',
-                        workTime: '2019-1-1',
-                        remain: '20'
-                    },
-                    {
-                        doctorId:'00010001',
-                        name: '王小明',
-                        department:'内科',
-                        workState:'全天',
-                        workTime: '2019-1-1',
-                        remain: '20'
-                    },
-                    {
-                        doctorId:'00010001',
-                        name: '王小明',
-                        department:'内科',
-                        workState:'全天',
-                        workTime: '2019-1-1',
-                        remain: '20'
-                    },
-                    {
-                        doctorId:'00010001',
-                        name: '王小明',
-                        department:'内科',
-                        workState:'全天',
-                        workTime: '2019-1-1',
-                        remain: '20'
-                    }
-                ],
+                data: [],
                 editIndex: -1,  // 当前聚焦的输入框的行数
                 editRemain: '',  // 第一列输入框，当然聚焦的输入框的输入内容，与 data 分离避免重构的闪烁
                 editWorkTime: '',  // 第三列输入框
                 editWorkState:'',
-                modal: false,
                 options3: {
                     disabledDate (date) {
                         return date && date.valueOf() < Date.now() 
@@ -195,9 +162,41 @@
                         label: '下午'
                     },
                 ],
-
+                allData:[],
+                internalMadicine:[],
+                surgical:[],
+                stomatology:[],
+                doctorSelf:[],
+                searchValue:''
             }
         },
+        mounted:
+            function(){
+                let _this=this
+                this.$http.get('http://localhost:3000/getAsset.json').then((res)=>{
+                    if(res.body.code == 0){
+                        _this.allData=res.body.allData
+                        _this.data=_this.allData
+                        let len = _this.data.length
+                        for(let i = 0;i<len;i++){
+                            if(_this.data[i].workState==0){
+                                _this.data[i].workState='休息'
+                            }else if(_this.data[i].workState==1){
+                                _this.data[i].workState='全天'
+                            }else if(_this.data[i].workState==2){
+                                _this.data[i].workState='上午'
+                            }else if(_this.data[i].workState==3){
+                                _this.data[i].workState='下午'
+                            }
+                            _this.data[i].workTime=_this.getworkTime(_this.data[i].workTime)
+                        }
+                    }else{
+                        _this.$Message.info('无此信息')
+                    }
+                },(res)=>{
+                    alert('出错误了！')
+                })
+            },
         methods:{
             goBackHome:function(){
                 this.$router.push('/home')
@@ -235,6 +234,113 @@
             },
             goToNewAsset(){
                 this.$router.push('/newAsset')
+            },
+            search(){
+                let _this=this
+                if(_this.searchValue=='内科'||_this.searchValue=='外科'||_this.searchValue=='口腔科'){
+                    this.$http.post('http://localhost:3000/getAssetBySearch.json',{strValue:_this.searchValue}).then((res)=>{
+                        if(res.body.code == 0){
+                            if(_this.searchValue=='内科'){
+                                _this.internalMadicine=res.body.data
+                                _this.data=_this.internalMadicine
+                            }else if(_this.searchValue=='外科'){
+                                _this.surgical=res.body.data
+                                _this.data=_this.surgical
+                            }else{
+                                _this.stomatology=res.body.data
+                                _this.data=_this.stomatology
+                            }
+                            let len = _this.data.length
+                            for(let i = 0;i<len;i++){
+                                if(_this.data[i].workState==0){
+                                    _this.data[i].workState='休息'
+                                }else if(_this.data[i].workState==1){
+                                    _this.data[i].workState='全天'
+                                }else if(_this.data[i].workState==2){
+                                    _this.data[i].workState='上午'
+                                }else if(_this.data[i].workState==3){
+                                    _this.data[i].workState='下午'
+                                }
+                                _this.data[i].workTime=_this.getworkTime(_this.data[i].workTime)
+                            }
+                        }else{
+                            _this.$Message.info('无此信息')
+                        }
+                    },(res)=>{
+                        alert('出错误了！')
+                    })
+                }else{
+                    if(/^[0-9]+$/.test(_this.searchValue)){
+                        //该处应该是医生ID号
+                        this.$http.post('http://localhost:3000/selectAssetById.json',{strValue:_this.searchValue}).then((res)=>{
+                            if(res.body.code == 0){
+                                _this.doctorSelf=res.body.data
+                                _this.data=_this.doctorSelf
+                                let len = _this.data.length
+                                for(let i = 0;i<len;i++){
+                                    if(_this.data[i].workState==0){
+                                        _this.data[i].workState='休息'
+                                    }else if(_this.data[i].workState==1){
+                                        _this.data[i].workState='全天'
+                                    }else if(_this.data[i].workState==2){
+                                        _this.data[i].workState='上午'
+                                    }else if(_this.data[i].workState==3){
+                                        _this.data[i].workState='下午'
+                                    }
+                                    _this.data[i].workTime=_this.getworkTime(_this.data[i].workTime)
+                                }
+                            }else{
+                                _this.$Message.info('无此信息')
+                            }
+                        })
+                    }else if(_this.searchValue!=''){
+                        this.$http.post('http://localhost:3000/selectAssetByName.json',{strValue:_this.searchValue}).then((res)=>{
+                            if(res.body.code == 0){
+                                _this.doctorSelf=res.body.data
+                                _this.data=_this.doctorSelf
+                                let len = _this.data.length
+                                for(let i = 0;i<len;i++){
+                                    if(_this.data[i].workState==0){
+                                        _this.data[i].workState='休息'
+                                    }else if(_this.data[i].workState==1){
+                                        _this.data[i].workState='全天'
+                                    }else if(_this.data[i].workState==2){
+                                        _this.data[i].workState='上午'
+                                    }else if(_this.data[i].workState==3){
+                                        _this.data[i].workState='下午'
+                                    }
+                                    _this.data[i].workTime=_this.getworkTime(_this.data[i].workTime)
+                                }
+                            }else{
+                                _this.$Message.info('无此信息')
+                            }
+                        })
+                    }else{
+                        this.$http.get('http://localhost:3000/getAsset.json').then((res)=>{
+                            if(res.body.code == 0){
+                                _this.allData=res.body.allData
+                                _this.data=_this.allData
+                                let len = _this.data.length
+                                for(let i = 0;i<len;i++){
+                                    if(_this.data[i].workState==0){
+                                        _this.data[i].workState='休息'
+                                    }else if(_this.data[i].workState==1){
+                                        _this.data[i].workState='全天'
+                                    }else if(_this.data[i].workState==2){
+                                        _this.data[i].workState='上午'
+                                    }else if(_this.data[i].workState==3){
+                                        _this.data[i].workState='下午'
+                                    }
+                                    _this.data[i].workTime=_this.getworkTime(_this.data[i].workTime)
+                                }
+                            }else{
+                                _this.$Message.info('无此信息')
+                            }
+                        },(res)=>{
+                            alert('出错误了！')
+                        })
+                    }
+                }
             }
         }
     }

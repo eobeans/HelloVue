@@ -72,6 +72,7 @@
                                             <Col span="6">接诊时间：</Col>
                                             <Col span="12">{{$store.state.User.accessTime}}&nbsp;&nbsp;&nbsp;&nbsp;{{$store.state.User.timeLine}}</Col>
                                         </Row>
+                                        
                                         <Row style="margin-bottom:18px;">
                                             <Col span="8" offset="4" style="text-align:center">
                                                 <Button  @click.native="comfireAppointment()">确认订单</Button>
@@ -79,6 +80,9 @@
                                             <Col span="8"  style="text-align:center">
                                                 <Button  @click.native="cancelAppointment()">取消订单</Button>
                                             </Col>
+                                        </Row>
+                                        <Row style="margin-bottom:24px;">
+                                            <Col span="16" offset="4" style="text-align:center;font-size:10px">订单将在点击确认订单后下单，若需重新选择医生点击取消订单即可</Col>
                                         </Row>
                                     </Card>
                                 </div>

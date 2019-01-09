@@ -100,24 +100,44 @@ app.post('/selectTime.json',(req,res)=>{
         doctorId:req.body.doctorId,
         accessTime:time
     }
-    patient.selectOrderByIdTime(order,(result)=>{
-        if(result[0] != null){
-            let obj={
-                code:0,
-                codeNum:0,
-                result:result,
+    new Promise((reslove,reject)=>{
+        patient.selectOrderByIdTime(order,(result)=>{
+            if(result[0] != null){
+                let obj={
+                    code:0,
+                    codeNum:0,
+                    result:result,
+                }
+                reslove(obj)
+            }else{
+                let obj={
+                    code:0,
+                    codeNum:1,
+                }
+                reslove(obj)
             }
-            res.json(obj)
-        }else{
-            let obj={
-                code:0,
-                codeNum:1,
+            
+        })
+    }).then(orderObj=>{
+        patient.selectAssetByWorkTime(order.doctorId,order.accessTime,(result)=>{
+            // console.log(result)
+            if(result[0] != null){
+                let obj={
+                    code:0,
+                    orderObj:orderObj,
+                }
+                res.json(obj)
+            }else{
+                let obj={
+                    code:1,
+                    orderObj:orderObj
+                }
+                res.json(obj)
             }
-            res.json(obj)
-        }
-        
+        })
     })
 })
+
 
 app.post('/postRegisterForm.json',(req,res)=>{
     patient.insertUser(req.body.registerForm,result=>{
@@ -159,6 +179,62 @@ app.post('/newAsset.json',(req,res)=>{
     })
 })
 
+app.get('/getAsset.json',(req,res)=>{
+    asset.getAsset(result=>{
+        let obj={
+            code:0,
+            allData:result,
+        }
+        res.json(obj)
+    })
+})
+
+app.post('/getAssetBySearch.json',(req,res)=>{
+    asset.getAssetBySearch(req.body.strValue,(result)=>{
+        let obj={
+            code:0,
+            data:result,
+        }
+        res.json(obj)
+    })
+})
+
+app.post('/selectAssetById.json',(req,res)=>{
+    asset.selectAssetById(req.body.strValue,(result)=>{
+        if(result != null){
+            let obj={
+                code:0,
+                data:result,        
+            }
+            res.json(obj)
+        }else{
+            let obj={
+                code:1,
+                data:result,        
+            }
+            res.json(obj)
+        }
+        
+    })
+})
+
+app.post('/selectAssetByName.json',(req,res)=>{
+    asset.selectAssetByName(req.body.strValue,(result)=>{
+        if(result != null){
+            let obj={
+                code:0,
+                data:result,        
+            }
+            res.json(obj)
+        }else{
+            let obj={
+                code:1,
+                data:result,        
+            }
+            res.json(obj)
+        }
+    })
+})
 app.listen(3000,()=>{
     console.log('server run at port 3000!')
 })
