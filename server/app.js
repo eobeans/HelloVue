@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser')
 let Promise = require('promise')
 let patient = require('./utiles/patient')
 let asset = require('./utiles/asset')
+let moment = require('moment')
 const app = express()
 
 let allowCrossDomain = function(req, res, next) {
@@ -150,23 +151,90 @@ app.post('/postRegisterForm.json',(req,res)=>{
 
 app.post('/postAppointment.json',(req,res)=>{
     let order = req.body.order
-    patient.insertOrder(order,result=>{
-        let obj = {
-            code:0,
-            count:1,
+    new Promise((reslove,reject)=>{
+        patient.selectIrregularityByIdTime(order,result=>{
+            if(result != null){
+                let time=moment(result.endTime).format("YYYY-MM-DD hh:mm:ss")
+                let state=1
+                let obj={
+                    code:1,
+                    endtime:time,
+                }
+                res.json(obj)
+                reslove(state)
+            }else{
+                let state=0
+                reslove(state)
+            }
+        })
+    }).then((state)=>{
+        if(state==0){
+            patient.insertOrder(order,result=>{
+                let obj = {
+                    code:0,
+                }
+                res.json(obj)
+            })
         }
-        res.json(obj)
     })
+    
 })
+
+
 
 app.post('/cancelAppointment.json',(req,res)=>{
     let cancleOrder = req.body.cancleOrder
-    //console.log(cancleOrder.serial)
-    patient.updatetOrder(cancleOrder,result=>{
-        let obj = {
-            code:0,
+    let Sorder={
+        userId:cancleOrder.userId,
+        appointTime:moment().format('YYYY-MM-DD'),
+    }
+    new Promise((reslove,reject)=>{
+        patient.selectOrderCountByIdTime(Sorder,result=>{
+            if(result['COUNT(*)']>=3){
+                let count=1
+                reslove(count)
+            }else if(result['COUNT(*)']>=10){
+                let count=2
+                reslove(count)
+            }else{
+                let count=0
+                reslove(count)
+            }
+        })
+    }).then((count)=>{
+        if(count==1){
+            let beginTime=moment().format('YYYY-MM-DD HH:mm:ss')
+            let endTime=moment().add(15, 'm').format('YYYY-MM-DD HH:mm:ss')
+            let order={
+                userId:cancleOrder.userId,
+                beginTime:beginTime,
+                endTime:endTime
+            }
+            patient.inserIrrigulatrity(order,result=>{
+                
+                console.log('我应该插入成功了啊')
+            })
+        }else if(count==2){
+            let beginTime=moment().format('YYYY-MM-DD HH:mm:ss')
+            let endTime=moment().add(1, 'd').format('YYYY-MM-DD HH:mm:ss')
+            let order={
+                userId:cancleOrder.userId,
+                beginTime:beginTime,
+                endTime:endTime,
+            }
+            patient.inserIrrigulatrity(order,result=>{
+                
+            })
         }
-        res.json(obj)
+    }).then(()=>{
+        patient.updatetOrder(cancleOrder,result=>{
+            let obj = {
+                code:0,
+            }
+            res.json(obj)
+        })
+    }).catch(reject=>{
+        console.log(reject)
     })
 })
 
@@ -235,6 +303,25 @@ app.post('/selectAssetByName.json',(req,res)=>{
         }
     })
 })
+
+app.post('/updateAssetByIdTime.json',(req,res)=>{
+    asset.updateAssetByIdTime(req.body.updateAsset,result=>{
+        let obj={
+            code:0,     
+        }
+        res.json(obj)
+    })
+})
+
+app.post('/deleteAssetByIdTime.json',(req,res)=>{
+    asset.deleteAssetByIdTime(req.body.deleteAsset,result=>{
+        let obj={
+            code:0,     
+        }
+        res.json(obj)
+    })
+})
+
 app.listen(3000,()=>{
     console.log('server run at port 3000!')
 })

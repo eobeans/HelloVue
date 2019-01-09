@@ -406,23 +406,30 @@
                                             // alert('上午')
                                             if(res.body.orderObj.result[i].number<_this.remain/4){
                                                 _this.List.l01[res.body.orderObj.result[i].number-1]=0
-                                                // alert(_this.List.l01[res.body.orderObj.result[i].number-1])
                                             }else if(res.body.orderObj.result[i].number<_this.remain/2){
-                                                _this.List.l02[res.body.orderObj.result[i].number-(_this.remain/4)-1]=0
+                                                let id= res.body.orderObj.result[i].number-Math.ceil(_this.remain/4)-1
+                                                _this.List.l02[id]=0
                                             }else if(res.body.orderObj.result[i].number<_this.remain*(3/4)){
-                                                _this.List.l03[res.body.orderObj.result[i].number-(_this.remain/2)-1]=0
+                                                let id=res.body.orderObj.result[i].number-Math.ceil(_this.remain/2)-1
+                                                _this.List.l03[id]=0
                                             }else{
-                                                _this.List.l04[res.body.orderObj.result[i].number-_this.remain*(3/4)-1]=0
+                                                let id= res.body.orderObj.result[i].number-Math.ceil(_this.remain*(3/4))-1
+                                                // alert(id)
+                                                _this.List.l04[id]=0
                                             }
                                         }else{
                                             if(res.body.orderObj.result[i].number<_this.remain/4){
+                                                
                                                 _this.List.l11[res.body.orderObj.result[i].number-1]=0
                                             }else if(res.body.orderObj.result[i].number<_this.remain/2){
-                                                _this.List.l12[res.body.orderObj.result[i].number-(_this.remain/4)-1]=0
+                                                let id= res.body.orderObj.result[i].number-Math.ceil(_this.remain/4)-1
+                                                _this.List.l12[id]=0
                                             }else if(res.body.orderObj.result[i].number<_this.remain*(3/4)){
-                                                _this.List.l13[res.body.orderObj.result[i].number-(_this.remain/2)-1]=0
+                                                let id=res.body.orderObj.result[i].number-Math.ceil(_this.remain/2)-1
+                                                _this.List.l13[id]=0
                                             }else{
-                                                _this.List.l14[res.body.orderObj.result[i].number-_this.remain*(3/4)-1]=0
+                                                let id= res.body.orderObj.result[i].number-Math.ceil(_this.remain*(3/4))-1
+                                                _this.List.l14[id]=0
                                             }
                                         }
                                     }

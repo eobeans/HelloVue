@@ -138,8 +138,7 @@
                 this.cancleOrder.serial=this.$store.state.User.serial
                 this.$http.post('http://localhost:3000/cancelAppointment.json',{cancleOrder:_this.cancleOrder}).then(res=>{
                     if(res.body.code == 0){
-                        alert('订单取消成功，确定后将返回上一页')
-                        _this.$router.push('/doctor')
+                        _this.$Message.info('取消成功')
                     }
                 })
             },
@@ -159,11 +158,9 @@
                             _this.count = res.body.count
                             alert('订单确认成功')
                         }else{
-                            _this.count = 0
-                            alert('系统出问题了')
+                            alert('你被锁单了,锁单将于：'+res.body.endtime+'  后结束')
                         }
                     },(res)=>{
-                        _this.count = 0
                         alert('出错误了！')
                     })
                 }else{

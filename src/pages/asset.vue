@@ -139,6 +139,17 @@
                 editRemain: '',  // 第一列输入框，当然聚焦的输入框的输入内容，与 data 分离避免重构的闪烁
                 editWorkTime: '',  // 第三列输入框
                 editWorkState:'',
+                editDoctorId:'',
+                updateAsset:{
+                    doctorId:'',
+                    workState:'',
+                    workTime:'',
+                    remain:'',
+                },
+                deleteAsset:{
+                    doctorId:'',
+                    workTime:'',
+                },
                 options3: {
                     disabledDate (date) {
                         return date && date.valueOf() < Date.now() 
@@ -202,6 +213,7 @@
                 this.$router.push('/home')
             },
             handleEdit (row, index) {
+                this.editDoctorId =  row.doctorId
                 this.editWorkTime = row.workTime
                 this.editWorkState = row.workState
                 this.editRemain = row.remain
@@ -209,18 +221,45 @@
             },
             handleSave (index) {
                 let _this = this
-                if(this.editWorkState == 0){
-                    this.data[index].workState = '休息'
-                }else if(this.editWorkState == 1){
-                    this.data[index].workState = '全天'
-                }else if(this.editWorkState == 2){
-                    this.data[index].workState = '上午'
-                }else if(this.editWorkState == 3){
-                    this.data[index].workState = '下午'
-                }
-                this.data[index].workTime = this.getworkTime(this.editWorkTime)
-                this.data[index].remain = this.editRemain
+                
+                //以下是upddateAsset
+                this.updateAsset.doctorId=this.editDoctorId
+                this.updateAsset.workState=this.editWorkState
+                this.updateAsset.workTime=this.getworkTime(this.editWorkTime)
+                this.updateAsset.remain=this.editRemain
+                // alert(this.updateAsset.doctorId+ this.updateAsset.workState+this.updateAsset.workTime+this.updateAsset.remain)
+                this.$http.post('http://localhost:3000/updateAssetByIdTime.json',{updateAsset:_this.updateAsset}).then((res)=>{
+                    if(res.body.code==0){
+                        if(_this.editWorkState == 0){
+                            _this.data[index].workState = '休息'
+                        }else if(_this.editWorkState == 1){
+                            _this.data[index].workState = '全天'
+                        }else if(_this.editWorkState == 2){
+                            _this.data[index].workState = '上午'
+                        }else if(_this.editWorkState == 3){
+                            _this.data[index].workState = '下午'
+                        }
+                        _this.data[index].workTime = _this.getworkTime(_this.editWorkTime)
+                        _this.data[index].remain = _this.editRemain
+                    }else{
+                        _this.$Message.info('信息修改失败')
+                    }
+                })
                 this.editIndex = -1
+            },
+            handleDeleate(row,index){
+                let _this = this
+                //以下是deleteAsset
+                this.deleteAsset.doctorId=this.editDoctorId
+                this.deleteAsset.workTime=this.getworkTime(this.editWorkTime)
+                this.$http.post('http://localhost:3000/deleteAssetByIdTime.json',{deleteAsset:_this.deleteAsset}).then((res)=>{
+                    if(res.body.code==0){
+                        console.log('信息删除成功')
+                        _this.data.splice(index, 1)
+                    }else{
+                        _this.$Message.info('信息删除失败')
+                    }
+                })
             },
             time(date){
                 this.editWorkTime=date

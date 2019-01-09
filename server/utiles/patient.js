@@ -1,5 +1,6 @@
 let mysql = require('mysql')
 let Promise = require('promise')
+let moment = require('moment')
 // let connection = mysql.createConnection({
 //     host     : 'localhost',
 //     user     : 'root',
@@ -154,6 +155,51 @@ function updatetOrder(cancleOrder,callback){
   })
 }
 
+function selectOrderCountByIdTime(countOrder,callback){
+  let minTime = moment(countOrder.appointTime).subtract(7, 'days').format('YYYY-MM-DD')
+  sql="SELECT COUNT(*) from `order` WHERE cancel=1 AND userId='"+countOrder.userId+"' AND appointTime<='"+countOrder.appointTime+"'AND appointTime>='"+minTime+"'"
+  pool.getConnection((err,connection)=>{
+    if(err) throw err
+
+    connection.query(sql,(err,result)=>{
+      if(err)  throw err
+
+      let a = dataJson(result)
+      callback(a[0])
+    })
+    connection.release()
+  })
+}
+
+function selectIrregularityByIdTime(countOrder,callback){
+  sql="SELECT * from `irregularity` WHERE userId='"+countOrder.userId+"' AND endTime>='"+countOrder.appointTime+"'"
+  pool.getConnection((err,connection)=>{
+    if(err) throw err
+
+    connection.query(sql,(err,result)=>{
+      if(err)  throw err
+
+      let a = dataJson(result)
+      callback(a[0])
+    })
+    connection.release()
+  })
+}
+
+function inserIrrigulatrity(order,callback){
+  sql="INSERT INTO irregularity (userId,beginTime,endTime) VALUES ('"+order.userId+"','"+order.beginTime+"','"+order.endTime+"')"
+  pool.getConnection((err,connection)=>{
+    if(err) throw err
+
+    connection.query(sql,(err,result)=>{
+      if(err)  throw err
+
+      callback()
+    })
+    connection.release()
+  })
+}
+
 module.exports={
   selectUserbyUser:selectUserbyUser,
   getDoctorInfo:getDoctorInfo,
@@ -164,4 +210,7 @@ module.exports={
   insertOrder:insertOrder,
   updatetOrder:updatetOrder,
   selectAssetByWorkTime:selectAssetByWorkTime,
+  selectOrderCountByIdTime:selectOrderCountByIdTime,
+  selectIrregularityByIdTime:selectIrregularityByIdTime,
+  inserIrrigulatrity:inserIrrigulatrity
 }

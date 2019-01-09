@@ -23,7 +23,7 @@ import store from '../store/index'
 
 const router = new VueRouter({
   routes:[
-    {path:'/',component:Asset},
+    {path:'/',component:Home},
     {path:'/home',component:Home},
     {path:'/appointment',component:Appointment},
     {path:'/doctor',component:Doctor},

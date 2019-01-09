@@ -18,60 +18,7 @@ function dataJson(data){
     return b
 }
 
-function assetWork(){
-    new Promise((resolve,reject)=>{
-        sql="SELECT * FROM doctor"
-        pool.getConnection(function(err,connection){
-            if(err) throw err
-        
-            connection.query(sql,(err,result)=>{
-                if(err) throw err
-        
-                let a = dataJson(result)
-                resolve(a)
-            })
-        connection.release()
-        })
-    }).then((result)=>{
-        let date = result
-        let len = date.length
-        pool.getConnection(function(err,connection){
-            for(let i = 0;i<len;i++){
-                for(let j = 0;j<21;j++){
-                    let workTime=moment().add(j, 'd').format('YYYY-MM-DD')
-                    sql="INSERT INTO `asset` (doctorId,name,department,workState,workTime,remain) VALUES ('"+date[i].doctorId+"','"+date[i].name+"','"+date[i].department+"','"+1+"','"+workTime+"','"+date[i].remain+"')"
-                    connection.query(sql,(err,result)=>{
-                        if(err) throw err
-                        
-                        console.log('success add:'+date[i].doctorId)
-                    })
-                }
 
-            }
-            connection.release()
-        })
-    }).catch(err=>{
-        console.log(err)
-    })
-}
-
-function deleteAsset(){
-    pool.getConnection(function(err,connection){
-        if(err) throw err
-        
-        let j = 0
-        for(let i = 0;i<60;i++){
-            j =   j + 5
-            sql="DELETE FROM `asset` WHERE ID = ' "+j+"'"
-            connection.query(sql,(err,result)=>{
-                if(err) throw err
-          
-                console.log('delete where ID ='+j)
-            })
-        }
-        connection.release()
-    })
-}
 
 function getDoctorIdList(callback){
     sql="SELECT doctorId FROM doctor"
@@ -176,8 +123,37 @@ function selectAssetByName(strValue,callback){
         connection.release()
     })
 }
+
+function updateAssetByIdTime(updateAsset,callback){
+    sql="UPDATE asset SET workState='"+updateAsset.workState+"',workTime='"+updateAsset.workTime+"',remain='"+updateAsset.remain+"' WHERE doctorId='"+updateAsset.doctorId+"' AND workTime='"+updateAsset.workTime+"'"
+    pool.getConnection(function(err,connection){
+        if(err) throw err
+    
+        connection.query(sql,(err,result)=>{
+          if(err) throw err
+
+          callback()
+        })
+        connection.release()
+    })
+}
+
+function deleteAssetByIdTime(updateAsset,callback){
+    sql="DELETE FROM asset WHERE doctorId='"+updateAsset.doctorId+"' And workTime='"+updateAsset.workTime+"'"
+    pool.getConnection(function(err,connection){
+        if(err) throw err
+    
+        connection.query(sql,(err,result)=>{
+          if(err) throw err
+
+          callback()
+        })
+        connection.release()
+    })
+}
+
+
 module.exports={
-    // selectUserbyUser:selectUserbyUser,
     getDoctorIdList:getDoctorIdList,
     getDoctorById:getDoctorById,
     addAsset:addAsset,
@@ -185,5 +161,7 @@ module.exports={
     getAssetBySearch:getAssetBySearch,
     selectAssetById:selectAssetById,
     selectAssetByName:selectAssetByName,
+    updateAssetByIdTime:updateAssetByIdTime,
+    deleteAssetByIdTime:deleteAssetByIdTime,
   }
   
