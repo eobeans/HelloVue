@@ -18,6 +18,7 @@ import Doctor from './pages/doctor.vue'
 import Register from './pages/register.vue'
 import Asset from './pages/asset.vue'
 import NewAsset from './pages/newAsset.vue'
+import User from './pages/user.vue'
 import store from '../store/index'
 
 
@@ -31,6 +32,7 @@ const router = new VueRouter({
     {path:'/register',component:Register},
     {path:'/asset',component:Asset},
     {path:'/newAsset',component:NewAsset},
+    {path:'/user',component:User},
   ]
 })
 

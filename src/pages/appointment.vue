@@ -139,6 +139,7 @@
                 this.$http.post('http://localhost:3000/cancelAppointment.json',{cancleOrder:_this.cancleOrder}).then(res=>{
                     if(res.body.code == 0){
                         _this.$Message.info('取消成功')
+                        this.$router.push('/doctor')
                     }
                 })
             },
@@ -156,7 +157,8 @@
                     this.$http.post('http://localhost:3000/postAppointment.json',{order:_this.order}).then((res)=>{
                         if(res.body.code == 0){
                             _this.count = res.body.count
-                            alert('订单确认成功')
+                            _this.$Message.info('订单确认成功')
+                            _this.$router.push('/user')
                         }else{
                             alert('你被锁单了,锁单将于：'+res.body.endtime+'  后结束')
                         }

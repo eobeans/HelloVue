@@ -102,6 +102,7 @@
                             <Col span="6">医生姓名：{{name}}</Col>
                             <Col span="6">职位：{{position}}</Col>
                             <Col span="6">今日号数：{{remain}}</Col>
+                            <Col span="6"><Button type="primary" style="margin-top:-10px;" @click.native.prevent="goToUser">查看我的订单</Button></Col>
                         </row>
                         
                         <Divider />
@@ -300,6 +301,9 @@
                 }
             },
         methods:{
+            goToUser(){
+                this.$router.push('/user')
+            },
             selectDoctor(ID){
                 let _this=this
                 _this.doctorId=ID
@@ -323,6 +327,16 @@
                 _this.isActive.t5=0
                 _this.isActive.t6=0
                 _this.isActive.t7=0
+                _this.List.l0=[]
+                _this.List.l1=[]
+                _this.List.l01=[]
+                _this.List.l02=[]
+                _this.List.l03=[]
+                _this.List.l04=[]
+                _this.List.l11=[]
+                _this.List.l12=[]
+                _this.List.l13=[]
+                _this.List.l14=[]
             },
             postAppointment(num,state,timeLine){
                 let myDate=new Date()

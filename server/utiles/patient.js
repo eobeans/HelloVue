@@ -15,6 +15,7 @@ let pool = mysql.createPool({
     password : 'mayongjie',
     database : 'appointment',
     port: 3306,
+    // maxActive=30,
 })
 
 function dataJson(data){
@@ -69,7 +70,7 @@ function selectDoctorById(doctorId,callback){
 }
 
 function selectOrderByIdTime(order,callback){
-  sql="SELECT number,state FROM `order` where cancel=0 AND accessTime='"+order.accessTime+"' AND doctorId='"+order.doctorId+"'"
+  sql="SELECT number,state FROM `orders` where cancel=0 AND accessTime='"+order.accessTime+"' AND doctorId='"+order.doctorId+"'"
   pool.getConnection((err,connection)=>{
     if(err) throw err
 
@@ -98,7 +99,7 @@ function insertUser(registerForm,callback){
 }
 
 function selectOrderByOrder(order,callback){
-  sql="SELECT number,state FROM `order` where appointTime='"+order.appointTime+"' AND doctorId='"+order.doctorId+"'"
+  sql="SELECT number,state FROM `orders` where appointTime='"+order.appointTime+"' AND doctorId='"+order.doctorId+"'"
   pool.getConnection((err,connection)=>{
     if(err) throw err
 
@@ -128,7 +129,7 @@ function selectAssetByWorkTime(doctorId,workTime,callback){
 }
 
 function insertOrder(order,callback){
-  sql="INSERT INTO `order` (serial,number,userId,doctorId,state,appointTime,accessTime,timeLine) VALUES ('"+order.serial+"',"+order.number+",'"+order.userId+"','"+order.doctorId+"',"+order.appointState+",'"+order.appointTime+"','"+order.accessTime+"','"+order.timeLine+"')"
+  sql="INSERT INTO `orders` (serial,number,userId,doctorId,state,appointTime,accessTime,timeLine) VALUES ('"+order.serial+"',"+order.number+",'"+order.userId+"','"+order.doctorId+"',"+order.appointState+",'"+order.appointTime+"','"+order.accessTime+"','"+order.timeLine+"')"
   pool.getConnection((err,connection)=>{
     if(err) throw err
 
@@ -142,7 +143,7 @@ function insertOrder(order,callback){
 }
 
 function updatetOrder(cancleOrder,callback){
-  sql="UPDATE `order` SET cancel = 1 WHERE serial = '"+cancleOrder.serial+"'"
+  sql="UPDATE `orders` SET cancel = 1 WHERE serial = '"+cancleOrder.serial+"'"
   pool.getConnection((err,connection)=>{
     if(err) throw err
 
@@ -157,15 +158,17 @@ function updatetOrder(cancleOrder,callback){
 
 function selectOrderCountByIdTime(countOrder,callback){
   let minTime = moment(countOrder.appointTime).subtract(7, 'days').format('YYYY-MM-DD')
-  sql="SELECT COUNT(*) from `order` WHERE cancel=1 AND userId='"+countOrder.userId+"' AND appointTime<='"+countOrder.appointTime+"'AND appointTime>='"+minTime+"'"
+  // console.log(minTime)
+  // console.log(countOrder)
+  sql="SELECT COUNT(*) as c from orders WHERE cancel=1 AND userId='"+countOrder.userId+"' AND appointTime<='"+countOrder.appointTime+"'AND appointTime>='"+minTime+"'"
   pool.getConnection((err,connection)=>{
     if(err) throw err
 
-    connection.query(sql,(err,result)=>{
+    connection.query(sql,(err,row)=>{
       if(err)  throw err
 
-      let a = dataJson(result)
-      callback(a[0])
+      let a = dataJson(row)
+      callback(row[0])
     })
     connection.release()
   })
@@ -186,8 +189,37 @@ function selectIrregularityByIdTime(countOrder,callback){
   })
 }
 
-function inserIrrigulatrity(order,callback){
-  sql="INSERT INTO irregularity (userId,beginTime,endTime) VALUES ('"+order.userId+"','"+order.beginTime+"','"+order.endTime+"')"
+function inserIrrigulatrity(order){
+  //INSERT INTO `irregularity` (`userId`, `beginTime`, `endTime`) VALUES ('3', '2019-01-09 22:29:57', '2019-01-11 22:29:59')
+  sql="INSERT INTO 'irregularity'('userId','beginTime','endTime') VALUES('"+order.userId+"','"+order.beginTime+"','"+order.endTime+"')"
+  pool.getConnection((err,connection)=>{
+    if(err) throw err
+
+    connection.query(sql,(err,result)=>{
+      if(err)  throw err
+
+    })
+    connection.release()
+  })
+}
+
+function selectOrderByUserId(userId,callback){
+  sql="SELECT orders.*,doctor.`name` from orders,doctor WHERE orders.userId='"+userId+"' and orders.doctorId=doctor.doctorId and orders.cancel=0 and orders.finish=0"
+  pool.getConnection((err,connection)=>{
+    if(err) throw err
+
+    connection.query(sql,(err,result)=>{
+      if(err)  throw err
+
+      let a = dataJson(result)
+      callback(a)
+    })
+    connection.release()
+  })
+}
+
+function cancelOrderByserial(serial,callback){
+  sql="UPDATE `orders` SET cancel = 1 WHERE serial = '"+serial+"'"
   pool.getConnection((err,connection)=>{
     if(err) throw err
 
@@ -212,5 +244,7 @@ module.exports={
   selectAssetByWorkTime:selectAssetByWorkTime,
   selectOrderCountByIdTime:selectOrderCountByIdTime,
   selectIrregularityByIdTime:selectIrregularityByIdTime,
-  inserIrrigulatrity:inserIrrigulatrity
+  inserIrrigulatrity:inserIrrigulatrity,
+  selectOrderByUserId:selectOrderByUserId,
+  cancelOrderByserial:cancelOrderByserial,
 }

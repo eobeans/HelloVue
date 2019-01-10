@@ -188,20 +188,23 @@ app.post('/cancelAppointment.json',(req,res)=>{
         userId:cancleOrder.userId,
         appointTime:moment().format('YYYY-MM-DD'),
     }
+    // let count = 0
     new Promise((reslove,reject)=>{
         patient.selectOrderCountByIdTime(Sorder,result=>{
-            if(result['COUNT(*)']>=3){
-                let count=1
-                reslove(count)
-            }else if(result['COUNT(*)']>=10){
-                let count=2
-                reslove(count)
-            }else{
-                let count=0
-                reslove(count)
+            if(result!=null){
+                if(result.c>=3){
+                    let count=1
+                    console.log(count)
+                    reslove(count)
+                }else if(result.c>=10){
+                    let count=2
+                    console.log(count)
+                    reslove(count)
+                }
             }
         })
     }).then((count)=>{
+        console.log(count)        
         if(count==1){
             let beginTime=moment().format('YYYY-MM-DD HH:mm:ss')
             let endTime=moment().add(15, 'm').format('YYYY-MM-DD HH:mm:ss')
@@ -210,10 +213,8 @@ app.post('/cancelAppointment.json',(req,res)=>{
                 beginTime:beginTime,
                 endTime:endTime
             }
-            patient.inserIrrigulatrity(order,result=>{
-                
-                console.log('我应该插入成功了啊')
-            })
+            console.log(order)
+            patient.inserIrrigulatrity(order)
         }else if(count==2){
             let beginTime=moment().format('YYYY-MM-DD HH:mm:ss')
             let endTime=moment().add(1, 'd').format('YYYY-MM-DD HH:mm:ss')
@@ -222,19 +223,17 @@ app.post('/cancelAppointment.json',(req,res)=>{
                 beginTime:beginTime,
                 endTime:endTime,
             }
-            patient.inserIrrigulatrity(order,result=>{
-                
-            })
+            patient.inserIrrigulatrity(order)
         }
-    }).then(()=>{
+        return count
+    }).then((count)=>{
+        console.log(count)
         patient.updatetOrder(cancleOrder,result=>{
             let obj = {
                 code:0,
             }
             res.json(obj)
         })
-    }).catch(reject=>{
-        console.log(reject)
     })
 })
 
@@ -317,6 +316,25 @@ app.post('/deleteAssetByIdTime.json',(req,res)=>{
     asset.deleteAssetByIdTime(req.body.deleteAsset,result=>{
         let obj={
             code:0,     
+        }
+        res.json(obj)
+    })
+})
+
+app.post('/selectOrderByUserId.json',(req,res)=>{
+    patient.selectOrderByUserId(req.body.userId,result=>{
+        let obj={
+            code:0,
+            data:result
+        }
+        res.json(obj)
+    })
+})
+
+app.post('/cancelOrderByserial.json',(req,res)=>{
+    patient.cancelOrderByserial(req.body.serial,(result)=>{
+        let obj={
+            code:0,
         }
         res.json(obj)
     })
