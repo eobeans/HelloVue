@@ -78,7 +78,7 @@
                                                 <Button  @click.native="comfireAppointment()">确认订单</Button>
                                             </Col>
                                             <Col span="8"  style="text-align:center">
-                                                <Button  @click.native="cancelAppointment()">取消订单</Button>
+                                                <Button  @click.native="cancelAppointment()">返回上一步</Button>
                                             </Col>
                                         </Row>
                                         <Row style="margin-bottom:24px;">
@@ -136,12 +136,8 @@
                 this.cancleOrder.userId=this.$store.state.User.userId
                 this.cancleOrder.doctorId=this.$store.state.User.doctorId
                 this.cancleOrder.serial=this.$store.state.User.serial
-                this.$http.post('http://localhost:3000/cancelAppointment.json',{cancleOrder:_this.cancleOrder}).then(res=>{
-                    if(res.body.code == 0){
-                        _this.$Message.info('取消成功')
-                        this.$router.push('/doctor')
-                    }
-                })
+                _this.$Message.info('返回上一步')
+                this.$router.push('/doctor')
             },
             comfireAppointment(){
                 let _this = this

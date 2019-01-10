@@ -189,9 +189,9 @@ function selectIrregularityByIdTime(countOrder,callback){
   })
 }
 
-function inserIrrigulatrity(order){
+function inserIrrigulatrity(orders){
   //INSERT INTO `irregularity` (`userId`, `beginTime`, `endTime`) VALUES ('3', '2019-01-09 22:29:57', '2019-01-11 22:29:59')
-  sql="INSERT INTO 'irregularity'('userId','beginTime','endTime') VALUES('"+order.userId+"','"+order.beginTime+"','"+order.endTime+"')"
+  sql="INSERT INTO 'irregularity'('userId','beginTime','endTime') VALUES('"+orders.userId+"','"+orders.beginTime+"','"+orders.endTime+"')"
   pool.getConnection((err,connection)=>{
     if(err) throw err
 

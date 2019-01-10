@@ -94,7 +94,7 @@
                 </Sider>
                 <Layout :style="{padding: '0 24px 24px',float:'left'}">
                     <Breadcrumb :style="{margin: '24px 0'}">
-                        <BreadcrumbItem>home</BreadcrumbItem>
+                        <BreadcrumbItem @click.native.once="goBackHome">home</BreadcrumbItem>
                         <BreadcrumbItem>doctor</BreadcrumbItem>
                     </Breadcrumb>
                     <Content :style="{padding: '24px', minHeight: '280px', background: '#fff'}">
@@ -217,6 +217,7 @@
                 accessTime:'',
                 serial:'',
                 asset:1,
+                remainSelf:''
             }
         },
         mounted:
@@ -307,6 +308,7 @@
             selectDoctor(ID){
                 let _this=this
                 _this.doctorId=ID
+                _this.remain=''
                 _this.$store.commit('setDoctor',_this.doctorId)
                 // alert(_this.$store.state.User.doctorId)
                 this.$http.post('http://localhost:3000/selectDoctorById.json',{doctorId:_this.doctorId}).then((res)=>{
@@ -315,7 +317,7 @@
                         _this.name=doctor.name
                         _this.$store.commit('setDoctorName',doctor.name)
                         _this.position=doctor.position
-                        _this.remain=doctor.remain
+                        _this.remainSelf=doctor.remain
                     }
                 },(res)=>{
                     console.log('fail to get doctor!')
@@ -346,6 +348,9 @@
                 this.$store.commit('setAppointState',state)
                 this.$store.commit('setTimeLine',timeLine)
                 this.$router.push('/appointment')
+            },
+            goBackHome:function(){
+                this.$router.push('/home')
             },
             selectTime(day,num){
                 let _this=this
@@ -391,25 +396,59 @@
                     this.$http.post('http://localhost:3000/selectTime.json',{accessTime:_this.accessTime,doctorId:_this.doctorId}).then(res=>{
                         if(res.body.code == 0){
                             //该医生今日有排班
-                            
+                            _this.remain=res.body.asset.remain
+                            _this.remainSelf=res.body.asset.remain
                             if(res.body.orderObj.code == 0){
-                                for (let i=0;i< _this.remain;i++){
-                                    _this.List.l0.push(i+1)
-                                    _this.List.l1.push(i+1)
-                                    if (i<_this.remain/4){
-                                        _this.List.l01.push(i+1)
-                                        _this.List.l11.push(i+1)
-                                    }else if(i<_this.remain/2){
-                                        _this.List.l02.push(i+1)
-                                        _this.List.l12.push(i+1)
-                                    }else if(i<_this.remain*(3/4)){
-                                        _this.List.l03.push(i+1)
-                                        _this.List.l13.push(i+1)
-                                    }else{
-                                        _this.List.l04.push(i+1)
-                                        _this.List.l14.push(i+1)
+                                if(res.body.asset.workState==1){
+                                    for (let i=0;i< _this.remain;i++){
+                                        _this.List.l0.push(i+1)
+                                        _this.List.l1.push(i+1)
+                                        if (i<_this.remain/4){
+                                            _this.List.l01.push(i+1)
+                                            _this.List.l11.push(i+1)
+                                        }else if(i<_this.remain/2){
+                                            _this.List.l02.push(i+1)
+                                            _this.List.l12.push(i+1)
+                                        }else if(i<_this.remain*(3/4)){
+                                            _this.List.l03.push(i+1)
+                                            _this.List.l13.push(i+1)
+                                        }else{
+                                            _this.List.l04.push(i+1)
+                                            _this.List.l14.push(i+1)
+                                        }
                                     }
+                                    _this.remain=_this.remainSelf*2
+                                }else if(res.body.asset.workState==2){
+                                    for (let i=0;i< _this.remain;i++){
+                                        _this.List.l0.push(i+1)
+                                        if (i<_this.remain/4){
+                                            _this.List.l01.push(i+1)
+                                        }else if(i<_this.remain/2){
+                                            _this.List.l02.push(i+1)
+                                        }else if(i<_this.remain*(3/4)){
+                                            _this.List.l03.push(i+1)
+                                        }else{
+                                            _this.List.l04.push(i+1)
+                                        }
+                                    }
+                                }else if(res.body.asset.workState==3){
+                                    for (let i=0;i< _this.remain;i++){
+                                        _this.List.l1.push(i+1)
+                                        if (i<_this.remain/4){
+                                            _this.List.l11.push(i+1)
+                                        }else if(i<_this.remain/2){
+                                            _this.List.l12.push(i+1)
+                                        }else if(i<_this.remain*(3/4)){
+                                            _this.List.l13.push(i+1)
+                                        }else{
+                                            _this.List.l14.push(i+1)
+                                        }
+                                    }
+                                }else{
+                                    _this.remain=0
+                                    _this.$Message.info('该医生今日休息')
                                 }
+                                
                                 // alert('come in select time')
                                 _this.orderNumber=res.body.orderObj.result
                                 // alert(_this.orderNumber.length)
@@ -450,6 +489,7 @@
                                 }
                             }
                         }else{
+                            _this.remain=0
                             _this.$Message.info('该医生今日休息')
                         }
                         

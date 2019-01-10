@@ -225,6 +225,15 @@
                 //以下是upddateAsset
                 this.updateAsset.doctorId=this.editDoctorId
                 this.updateAsset.workState=this.editWorkState
+                if(_this.editWorkState == '休息'){
+                    _this.updateAsset.workState = 0
+                }else if(_this.editWorkState == '全天'){
+                     _this.updateAsset.workState = 1
+                }else if(_this.editWorkState == '上午'){
+                     _this.updateAsset.workState = 2
+                }else if(_this.editWorkState == '下午'){
+                     _this.updateAsset.workState = 3
+                }
                 this.updateAsset.workTime=this.getworkTime(this.editWorkTime)
                 this.updateAsset.remain=this.editRemain
                 // alert(this.updateAsset.doctorId+ this.updateAsset.workState+this.updateAsset.workTime+this.updateAsset.remain)

@@ -15,7 +15,7 @@
                  </Header>
                 <Content :style="{padding: '0 50px'}">
                     <Card>
-                        <div style="min-height: 390px;">
+                        <div style="min-height:560px;">
                             <form :model="loginForm" style="margin-top:160px;margin-left:540px;">
                                 <input type="text" name="username" class="inputText" v-model="loginForm.username" placeholder="用户" autocomplete="on">
                                 <input type="password" name="password" class="inputText" v-model="loginForm.password" placeholder="密码" autocomplete="on">

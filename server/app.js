@@ -120,12 +120,13 @@ app.post('/selectTime.json',(req,res)=>{
             
         })
     }).then(orderObj=>{
-        patient.selectAssetByWorkTime(order.doctorId,order.accessTime,(result)=>{
+        patient.selectAssetByWorkTime(order.doctorId,order.accessTime,(result1)=>{
             // console.log(result)
-            if(result[0] != null){
+            if(result1[0] != null){
                 let obj={
                     code:0,
                     orderObj:orderObj,
+                    asset:result1[0]
                 }
                 res.json(obj)
             }else{
@@ -234,6 +235,8 @@ app.post('/cancelAppointment.json',(req,res)=>{
             }
             res.json(obj)
         })
+    }).catch((count)=>{
+        console.log('黑命单加入出错了')
     })
 })
 
